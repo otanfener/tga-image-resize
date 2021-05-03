@@ -19,7 +19,8 @@ bool Decoder::FillTgaHeader(void) {
     m_Stream.read((char *) &m_Image.m_Header.Bits, sizeof(m_Image.m_Header.Bits));
     m_Stream.read((char *) &m_Image.m_Header.ImageDescriptor, sizeof(m_Image.m_Header.ImageDescriptor));
 
-    m_Image.m_pixelSize = m_Image.m_Header.Bits / 8;
+    m_Image.m_pixelSize =
+            m_Image.m_Header.ColorMapLength == 0 ? (m_Image.m_Header.Bits / 8) : m_Image.m_Header.ColorMapEntrySize;
     if (m_Stream) return true;
     else return false;
 }
@@ -31,7 +32,9 @@ bool Decoder::FillTgaImageBuffer(void) {
             std::cout << "No image data is found!" << std::endl;
             break;
         case 1:
-            std::cout << "Color mapped images are not supported!" << std::endl;
+            std::cout << "Reading color mapped image" << std::endl;
+            readColorMappedImageToBuffer(m_Image.m_ImageBuffer, m_Image.m_Header.ColorMapEntrySize);
+            isSuccessful = true;
             break;
         case 2:
             std::cout << "Reading true color image" << std::endl;
@@ -57,27 +60,72 @@ bool Decoder::FillTgaImageBuffer(void) {
 
 }
 
-std::vector <uint8_t> Decoder::GetTgaImageBuffer() {
+std::vector<uint8_t> Decoder::GetTgaImageBuffer() {
     return m_Image.m_ImageBuffer;
 }
 
-void Decoder::readUncompressedImageToBuffer(std::vector <uint8_t> &b, uint8_t bits) {
-    if (bits == 16) {
-        //Temporary
-        std::vector <uint8_t> contents((std::istreambuf_iterator<char>(m_Stream)), std::istreambuf_iterator<char>());
-        b = contents;
-    } else {
-        std::vector <uint8_t> contents((std::istreambuf_iterator<char>(m_Stream)), std::istreambuf_iterator<char>());
-        b = contents;
-    }
+void Decoder::readUncompressedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits) {
+    std::vector<uint8_t> contents((std::istreambuf_iterator<char>(m_Stream)), std::istreambuf_iterator<char>());
+    b = contents;
 }
 
-
-void Decoder::readCompressedImageToBuffer(std::vector <uint8_t> &b, uint8_t bits) {
-    uint8_t rleHeader;
+void Decoder::readColorMappedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits) {
     uint8_t blue, green, red, alpha;
+    switch (bits) {
+        case 24:
+            for (auto i = 0; i < m_Image.m_Header.ColorMapLength; ++i) {
+                m_Stream.read((char *) &blue, sizeof(blue));
+                b.push_back(blue);
+                m_Stream.read((char *) &green, sizeof(green));
+                b.push_back(green);
+                m_Stream.read((char *) &red, sizeof(red));
+                b.push_back(red);
+            }
+            break;
+        case 32:
+            for (auto i = 0; i < m_Image.m_Header.ColorMapLength; ++i) {
+                m_Stream.read((char *) &blue, sizeof(blue));
+                b.push_back(blue);
+                m_Stream.read((char *) &green, sizeof(green));
+                b.push_back(green);
+                m_Stream.read((char *) &red, sizeof(red));
+                b.push_back(red);
+                m_Stream.read((char *) &alpha, sizeof(alpha));
+                b.push_back(alpha);
+            }
+            break;
+    }
+
+}
+
+void Decoder::readCompressedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits) {
+    uint8_t rleHeader;
+    uint8_t blue, green, red, alpha, first, second;
     size_t numberOfPixels;
     switch (bits) {
+        case 16:
+            for (auto i = 0; i < m_Image.m_Header.Height * m_Image.m_Header.Width;) {
+                m_Stream.read((char *) &rleHeader, sizeof(rleHeader));
+                numberOfPixels = (rleHeader & 0x7F) + 1; // Extract repetition for the packet
+                if (rleHeader & 0x80) { //Determine if it's RLE packet or normal packet
+                    m_Stream.read((char *) &first, sizeof(first));
+                    m_Stream.read((char *) &second, sizeof(second));
+                    for (auto j = 0; j < numberOfPixels; j++) {
+                        b.push_back(first);
+                        b.push_back(second);
+                    }
+                    i += numberOfPixels;
+                } else {
+                    for (auto j = 0; j < numberOfPixels; j++) {
+                        m_Stream.read((char *) &first, sizeof(first));
+                        b.push_back(first);
+                        m_Stream.read((char *) &second, sizeof(second));
+                        b.push_back(second);
+                    }
+                    i += numberOfPixels;
+                }
+            }
+            break;
         case 24:
             for (auto i = 0; i < m_Image.m_Header.Height * m_Image.m_Header.Width;) {
                 m_Stream.read((char *) &rleHeader, sizeof(rleHeader));
@@ -129,11 +177,12 @@ void Decoder::readCompressedImageToBuffer(std::vector <uint8_t> &b, uint8_t bits
                         b.push_back(green);
                         m_Stream.read((char *) &red, sizeof(red));
                         b.push_back(red);
-                        m_Stream.read((char *) &red, sizeof(alpha));
+                        m_Stream.read((char *) &alpha, sizeof(alpha));
                         b.push_back(alpha);
                     }
                     i += numberOfPixels;
                 }
             }
+            break;
     }
 }

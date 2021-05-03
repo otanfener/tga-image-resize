@@ -18,8 +18,8 @@ private:
     Tga &m_Image;
 
     void readUncompressedImageToBuffer(std::vector <uint8_t> &b, uint8_t bits);
-
     void readCompressedImageToBuffer(std::vector <uint8_t> &b, uint8_t bits);
+    void readColorMappedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits);
 
 public:
     bool FillTgaHeader();

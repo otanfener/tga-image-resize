@@ -15,7 +15,7 @@ int main(int argc,  const char *argv[]) {
     }
     string filename = argv[1];
     std::ifstream inputFile(filename, std::ios_base::binary);
-    std::ofstream outputFile(filename + "_processed.tga", std::ios_base::binary);
+    std::ofstream outputFile( filename +"_processed.tga", std::ios_base::binary);
     Tga oldImage;
     Decoder d(inputFile, oldImage);
     if (!inputFile.is_open()) return 1;
