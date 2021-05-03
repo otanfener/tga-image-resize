@@ -14,8 +14,11 @@ int main(int argc,  const char *argv[]) {
         return 1;
     }
     string filename = argv[1];
+    std::string delimiter = ".";
+    std::string token = filename.substr(0, filename.find(delimiter));
+    string new_filename = token + "_processed.tga";
     std::ifstream inputFile(filename, std::ios_base::binary);
-    std::ofstream outputFile( filename +"_processed.tga", std::ios_base::binary);
+    std::ofstream outputFile( new_filename, std::ios_base::binary);
     Tga oldImage;
     Decoder d(inputFile, oldImage);
     if (!inputFile.is_open()) return 1;
