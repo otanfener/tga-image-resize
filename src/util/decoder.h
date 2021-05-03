@@ -8,20 +8,25 @@
 #include <fstream>
 #include "tga.h"
 #include <vector>
+
 class Decoder {
 public:
-    Decoder(std::ifstream& stream, Tga& image): m_Image(image), m_Stream(stream){};
+    Decoder(std::ifstream &stream, Tga &image) : m_Image(image), m_Stream(stream) {};
 
 private:
-    std::ifstream&  m_Stream;
-    Tga& m_Image;
-    void readUncompressedImageToBuffer(std::vector<uint8_t>& b, uint8_t bits);
-    void readCompressedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits);
+    std::ifstream &m_Stream;
+    Tga &m_Image;
+
+    void readUncompressedImageToBuffer(std::vector <uint8_t> &b, uint8_t bits);
+
+    void readCompressedImageToBuffer(std::vector <uint8_t> &b, uint8_t bits);
 
 public:
     bool FillTgaHeader();
+
     bool FillTgaImageBuffer();
-    std::vector<uint8_t> GetTgaImageBuffer();
+
+    std::vector <uint8_t> GetTgaImageBuffer();
 };
 
 

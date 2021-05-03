@@ -7,16 +7,18 @@
 
 #include "tga.h"
 #include <fstream>
+
 class Encoder {
 public:
-    Encoder(std::ofstream& stream, Tga& image): m_Image(image), m_Stream(stream){};
+    Encoder(std::ofstream &stream, Tga &image) : m_Image(image), m_Stream(stream) {};
 
 private:
-    std::ofstream&  m_Stream;
-    Tga& m_Image;
+    std::ofstream &m_Stream;
+    Tga &m_Image;
 public:
     bool createImageHeader(uint16_t width, uint16_t height, uint8_t bits);
-    bool writeImageToFile(std::vector<uint8_t>& b);
+
+    bool writeImageToFile(std::vector <uint8_t> &b);
 };
 
 

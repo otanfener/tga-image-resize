@@ -20,10 +20,11 @@ bool Encoder::createImageHeader(uint16_t width, uint16_t height, uint8_t bits) {
     m_Image.m_Header.ImageDescriptor = 0;
     return true;
 }
-bool Encoder::writeImageToFile(std::vector<uint8_t>& b) {
-    m_Stream.write((char*)&m_Image.m_Header, sizeof(m_Image.m_Header));
-    std::copy(b.begin(),b.end(),std::ostreambuf_iterator<char>(m_Stream));
+
+bool Encoder::writeImageToFile(std::vector <uint8_t> &b) {
+    m_Stream.write((char *) &m_Image.m_Header, sizeof(m_Image.m_Header));
+    std::copy(b.begin(), b.end(), std::ostreambuf_iterator<char>(m_Stream));
     m_Stream.flush();
-    if(m_Stream) return true;
+    if (m_Stream) return true;
     else return false;
 }
