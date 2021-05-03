@@ -5,75 +5,60 @@
 #include "decoder.h"
 #include <iostream>
 
-bool Decoder::FillTgaHeader(void) {
-    m_Stream.read((char *) &m_Image.m_Header.IDLength, sizeof(m_Image.m_Header.IDLength));
-    m_Stream.read((char *) &m_Image.m_Header.ColorMapType, sizeof(m_Image.m_Header.ColorMapType));
-    m_Stream.read((char *) &m_Image.m_Header.ImageType, sizeof(m_Image.m_Header.ImageType));
-    m_Stream.read((char *) &m_Image.m_Header.ColorMapOrigin, sizeof(m_Image.m_Header.ColorMapOrigin));
-    m_Stream.read((char *) &m_Image.m_Header.ColorMapLength, sizeof(m_Image.m_Header.ColorMapLength));
-    m_Stream.read((char *) &m_Image.m_Header.ColorMapEntrySize, sizeof(m_Image.m_Header.ColorMapEntrySize));
-    m_Stream.read((char *) &m_Image.m_Header.XOrigin, sizeof(m_Image.m_Header.XOrigin));
-    m_Stream.read((char *) &m_Image.m_Header.YOrigin, sizeof(m_Image.m_Header.YOrigin));
-    m_Stream.read((char *) &m_Image.m_Header.Width, sizeof(m_Image.m_Header.Width));
-    m_Stream.read((char *) &m_Image.m_Header.Height, sizeof(m_Image.m_Header.Height));
-    m_Stream.read((char *) &m_Image.m_Header.Bits, sizeof(m_Image.m_Header.Bits));
-    m_Stream.read((char *) &m_Image.m_Header.ImageDescriptor, sizeof(m_Image.m_Header.ImageDescriptor));
-
-    m_Image.m_pixelSize =
-            m_Image.m_Header.ColorMapLength == 0 ? (m_Image.m_Header.Bits / 8) : m_Image.m_Header.ColorMapEntrySize;
-    if (m_Stream) return true;
-    else return false;
+std::vector<uint8_t> Decoder::Decode(std::string &fileName){
+    std::ifstream stream(fileName, std::ios_base::binary);
+    if (!stream.is_open()){
+        //throw error
+    }
+    this->FillTgaHeader(stream);
+    this->CalculatePixelSize(this->_tgaImage.header);
+    this->FillTgaImageBuffer(stream);
+    return this->GetTgaImageBuffer();
 }
 
-bool Decoder::FillTgaImageBuffer(void) {
-    bool isSuccessful = false;
-    switch (m_Image.m_Header.ImageType) {
-        case 0:
-            std::cout << "No image data is found!" << std::endl;
-            break;
-        case 1:
-            std::cout << "Reading color mapped image" << std::endl;
-            readColorMappedImageToBuffer(m_Image.m_ImageBuffer, m_Image.m_Header.ColorMapEntrySize);
-            isSuccessful = true;
-            break;
-        case 2:
-            std::cout << "Reading true color image" << std::endl;
-            readUncompressedImageToBuffer(m_Image.m_ImageBuffer, m_Image.m_Header.Bits);
-            isSuccessful = true;
-            break;
-        case 3:
-            std::cout << "Reading grayscale  image" << std::endl;
-            readUncompressedImageToBuffer(m_Image.m_ImageBuffer, m_Image.m_Header.Bits);
-            isSuccessful = true;
-            break;
-        case 9:
-            std::cout << "Color mapped encoded images are not supported!" << std::endl;
-            break;
-        case 10:
-            std::cout << "Reading run-length encoded image" << std::endl;
-            readCompressedImageToBuffer(m_Image.m_ImageBuffer, m_Image.m_Header.Bits);
-            isSuccessful = true;
-            break;
+void Decoder::FillTgaHeader(std::ifstream &m_Stream) {
+    m_Stream.read((char *) &this->_tgaImage.header.IDLength, sizeof(this->_tgaImage.header.IDLength));
+    m_Stream.read((char *) &this->_tgaImage.header.ColorMapType, sizeof(this->_tgaImage.header.ColorMapType));
+    m_Stream.read((char *) &this->_tgaImage.header.ImageType, sizeof(this->_tgaImage.header.ImageType));
+    m_Stream.read((char *) &this->_tgaImage.header.ColorMapOrigin, sizeof(this->_tgaImage.header.ColorMapOrigin));
+    m_Stream.read((char *) &this->_tgaImage.header.ColorMapLength, sizeof(this->_tgaImage.header.ColorMapLength));
+    m_Stream.read((char *) &this->_tgaImage.header.ColorMapEntrySize, sizeof(this->_tgaImage.header.ColorMapEntrySize));
+    m_Stream.read((char *) &this->_tgaImage.header.XOrigin, sizeof(this->_tgaImage.header.XOrigin));
+    m_Stream.read((char *) &this->_tgaImage.header.YOrigin, sizeof(this->_tgaImage.header.YOrigin));
+    m_Stream.read((char *) &this->_tgaImage.header.Width, sizeof(this->_tgaImage.header.Width));
+    m_Stream.read((char *) &this->_tgaImage.header.Height, sizeof(this->_tgaImage.header.Height));
+    m_Stream.read((char *) &this->_tgaImage.header.Bits, sizeof(this->_tgaImage.header.Bits));
+    m_Stream.read((char *) &this->_tgaImage.header.ImageDescriptor, sizeof(this->_tgaImage.header.ImageDescriptor));
 
-    }
-    return isSuccessful;
+}
 
+uint32_t Decoder::CalculatePixelSize(TgaHeader_t &header){
+    /* performance optimization:  (num/8) = (num>>3) */
+    this->_tgaImage.pixelSize =  header.ColorMapLength == 0 ? (header.Bits >> 3) : header.ColorMapEntrySize;
+    return this->_tgaImage.pixelSize; 
+}
+
+
+
+void Decoder::FillTgaImageBuffer(std::ifstream &m_Stream) {
+    auto mapIter = _readImageToBufferMap.find((TgaImageType_t)this->_tgaImage.header.ImageType);
+    mapIter->second(m_Stream,this->_tgaImage.buffer, this->_tgaImage.header.Bits);
 }
 
 std::vector<uint8_t> Decoder::GetTgaImageBuffer() {
-    return m_Image.m_ImageBuffer;
+    return _tgaImage.buffer;
 }
 
-void Decoder::readUncompressedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits) {
+void Decoder::ReadUncompressedImageToBuffer(std::ifstream &m_Stream,std::vector<uint8_t> &b, uint8_t bits) {
     std::vector<uint8_t> contents((std::istreambuf_iterator<char>(m_Stream)), std::istreambuf_iterator<char>());
     b = contents;
 }
 
-void Decoder::readColorMappedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits) {
+void Decoder::ReadColorMappedImageToBuffer(std::ifstream &m_Stream,std::vector<uint8_t> &b, uint8_t bits) {
     uint8_t blue, green, red, alpha;
     switch (bits) {
         case 24:
-            for (auto i = 0; i < m_Image.m_Header.ColorMapLength; ++i) {
+            for (auto i = 0; i < _tgaImage.header.ColorMapLength; ++i) {
                 m_Stream.read((char *) &blue, sizeof(blue));
                 b.push_back(blue);
                 m_Stream.read((char *) &green, sizeof(green));
@@ -83,7 +68,7 @@ void Decoder::readColorMappedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits
             }
             break;
         case 32:
-            for (auto i = 0; i < m_Image.m_Header.ColorMapLength; ++i) {
+            for (auto i = 0; i < _tgaImage.header.ColorMapLength; ++i) {
                 m_Stream.read((char *) &blue, sizeof(blue));
                 b.push_back(blue);
                 m_Stream.read((char *) &green, sizeof(green));
@@ -98,91 +83,32 @@ void Decoder::readColorMappedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits
 
 }
 
-void Decoder::readCompressedImageToBuffer(std::vector<uint8_t> &b, uint8_t bits) {
+void Decoder::ReadCompressedImageToBuffer(std::ifstream &m_Stream,std::vector<uint8_t> &b, uint8_t bits) {
     uint8_t rleHeader;
-    uint8_t blue, green, red, alpha, first, second;
     size_t numberOfPixels;
-    switch (bits) {
-        case 16:
-            for (auto i = 0; i < m_Image.m_Header.Height * m_Image.m_Header.Width;) {
+    size_t channelSize = (bits>>3);
+    uint8_t channelBuf[channelSize];
+
+    for (auto i = 0; i <_tgaImage.header.Height * _tgaImage.header.Width;) {
                 m_Stream.read((char *) &rleHeader, sizeof(rleHeader));
                 numberOfPixels = (rleHeader & 0x7F) + 1; // Extract repetition for the packet
                 if (rleHeader & 0x80) { //Determine if it's RLE packet or normal packet
-                    m_Stream.read((char *) &first, sizeof(first));
-                    m_Stream.read((char *) &second, sizeof(second));
+                    m_Stream.read((char *) &channelBuf[0], channelSize);
                     for (auto j = 0; j < numberOfPixels; j++) {
-                        b.push_back(first);
-                        b.push_back(second);
+                        for(auto k=0;k<channelSize; k++){
+                            b.push_back(channelBuf[k]);
+                        }
                     }
                     i += numberOfPixels;
                 } else {
                     for (auto j = 0; j < numberOfPixels; j++) {
-                        m_Stream.read((char *) &first, sizeof(first));
-                        b.push_back(first);
-                        m_Stream.read((char *) &second, sizeof(second));
-                        b.push_back(second);
+                        m_Stream.read((char *) &channelBuf[k], channelSize);
+                        for(auto k=0;k<channelSize; k++){
+                            b.push_back(channelBuf[k]);
+                        }
                     }
                     i += numberOfPixels;
                 }
             }
-            break;
-        case 24:
-            for (auto i = 0; i < m_Image.m_Header.Height * m_Image.m_Header.Width;) {
-                m_Stream.read((char *) &rleHeader, sizeof(rleHeader));
-                numberOfPixels = (rleHeader & 0x7F) + 1; // Extract repetition for the packet
-                if (rleHeader & 0x80) { //Determine if it's RLE packet or normal packet
-                    m_Stream.read((char *) &blue, sizeof(blue));
-                    m_Stream.read((char *) &green, sizeof(green));
-                    m_Stream.read((char *) &red, sizeof(red));
-                    for (auto j = 0; j < numberOfPixels; j++) {
-                        b.push_back(blue);
-                        b.push_back(green);
-                        b.push_back(red);
-                    }
-                    i += numberOfPixels;
-                } else {
-                    for (auto j = 0; j < numberOfPixels; j++) {
-                        m_Stream.read((char *) &blue, sizeof(blue));
-                        b.push_back(blue);
-                        m_Stream.read((char *) &green, sizeof(green));
-                        b.push_back(green);
-                        m_Stream.read((char *) &red, sizeof(red));
-                        b.push_back(red);
-                    }
-                    i += numberOfPixels;
-                }
-            }
-            break;
-        case 32:
-            for (auto i = 0; i < m_Image.m_Header.Height * m_Image.m_Header.Width;) {
-                m_Stream.read((char *) &rleHeader, sizeof(rleHeader));
-                numberOfPixels = (rleHeader & 0x7F) + 1;
-                if (rleHeader & 0x80) {
-                    m_Stream.read((char *) &blue, sizeof(blue));
-                    m_Stream.read((char *) &green, sizeof(green));
-                    m_Stream.read((char *) &red, sizeof(red));
-                    m_Stream.read((char *) &alpha, sizeof(alpha));
-                    for (auto j = 0; j < numberOfPixels; j++) {
-                        b.push_back(blue);
-                        b.push_back(green);
-                        b.push_back(red);
-                        b.push_back(alpha);
-                    }
-                    i += numberOfPixels;
-                } else {
-                    for (auto j = 0; j < numberOfPixels; j++) {
-                        m_Stream.read((char *) &blue, sizeof(blue));
-                        b.push_back(blue);
-                        m_Stream.read((char *) &green, sizeof(green));
-                        b.push_back(green);
-                        m_Stream.read((char *) &red, sizeof(red));
-                        b.push_back(red);
-                        m_Stream.read((char *) &alpha, sizeof(alpha));
-                        b.push_back(alpha);
-                    }
-                    i += numberOfPixels;
-                }
-            }
-            break;
-    }
+    
 }

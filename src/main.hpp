@@ -1,0 +1,20 @@
+//
+// Created by ozan on 2021-04-29.
+//
+
+#ifndef RESIZE_MAIN_HPP
+#define RESIZE_MAIN_HPP
+
+#define NUM_OF_REQUIRED_ARGS    2
+
+typedef enum{
+SUCCESS=0,
+INVALID_USAGE,
+FILE_IS_ALREADY_OPEN,
+INVALID_HEADER,
+INAVLID_BUFFER,
+ERR_LAST
+}statusCodes_t;
+
+
+#endif //RESIZE_MAIN_H

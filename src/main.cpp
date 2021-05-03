@@ -1,58 +1,67 @@
 #include <iostream>
+#include "main.hpp"
 #include <tga.h>
 #include <decoder.h>
 #include <encoder.h>
 #include <image_processor.h>
 
-using namespace std;
-static const char *const USAGE = "Usage:\n\thalfsize <filename.tga> \n\nDescription:\n\tResizes given tga image file, and save it to a new tga image file.\n";
+#define STRING_DELIMITER "."
+#define PROCESSED_FILENAME_POSTFIX "_processed.tga";
+
+
 
 int main(int argc,  const char *argv[]) {
+    using namespace std;
 
-    if (argc < 2) {
+    string fileName = argv[1];
+    if ((NUM_OF_REQUIRED_ARGS > argc) || (0==fileName.length()) ||  (string::npos == fileName.find(".tga"))) {
+        const char *const USAGE = "Usage:\n\t\
+                                    halfsize <filename.tga> \n\n\
+                                    Description:\n\t\
+                                    Resizes given tga image file, and save it to a new tga image file.\n";
         cout << USAGE;
-        return 1;
+        return INVALID_USAGE;
     }
-    string filename = argv[1];
-    std::string delimiter = ".";
-    std::string token = filename.substr(0, filename.find(delimiter));
-    string new_filename = token + "_processed.tga";
-    std::ifstream inputFile(filename, std::ios_base::binary);
-    std::ofstream outputFile( new_filename, std::ios_base::binary);
-    Tga oldImage;
-    Decoder d(inputFile, oldImage);
-    if (!inputFile.is_open()) return 1;
-    if (!d.FillTgaHeader()) return 1;
-    if (!d.FillTgaImageBuffer()) return 1;
+    
+    string fileNameWithoutExtension = fileName.substr(0, fileName.find(STRING_DELIMITER));
+    ifstream inputFile(fileName, ios_base::binary);
+    
+    Tga originalImage;
+    auto decoder = make_unique<Decoder>();
+    //decoder->
+
+    Decoder decoder(originalImage);
 
     inputFile.seekg(0, std::ios_base::end);
     auto fileSize = inputFile.tellg();
     inputFile.seekg(0, std::ios_base::beg);
 
     cout << "File Size: " << fileSize << endl;
-    cout << "Header Id: " << (int) oldImage.m_Header.IDLength << endl;
-    cout << "Color Map type: " << (int) oldImage.m_Header.ColorMapType << endl;
-    cout << "Image type " << (int) oldImage.m_Header.ImageType << endl;
-    cout << "Colormap origin: " << (int) oldImage.m_Header.ColorMapOrigin << endl;
-    cout << "Colormap length: " << (int) oldImage.m_Header.ColorMapLength << endl;
-    cout << "Colormap size: " << (int) oldImage.m_Header.ColorMapEntrySize << endl;
+    cout << "Header Id: " << (int) originalImage.m_Header.IDLength << endl;
+    cout << "Color Map type: " << (int) originalImage.m_Header.ColorMapType << endl;
+    cout << "Image type " << (int) originalImage.m_Header.ImageType << endl;
+    cout << "Colormap origin: " << (int) originalImage.m_Header.ColorMapOrigin << endl;
+    cout << "Colormap length: " << (int) originalImage.m_Header.ColorMapLength << endl;
+    cout << "Colormap size: " << (int) originalImage.m_Header.ColorMapEntrySize << endl;
 
-    cout << "X Origin: " << (int) oldImage.m_Header.XOrigin << endl;
-    cout << "Y Origin: " << (int) oldImage.m_Header.YOrigin << endl;
-    cout << "Width: " << (int) oldImage.m_Header.Width << endl;
-    cout << "Height: " << (int) oldImage.m_Header.Height << endl;
-    cout << "Bits: " << (int) oldImage.m_Header.Bits << endl;
-    cout << "Pixel Size: " << oldImage.m_pixelSize << endl;
-    cout << "Descriptor: " << (int) oldImage.m_Header.ImageDescriptor << endl;
+    cout << "X Origin: " << (int) originalImage.m_Header.XOrigin << endl;
+    cout << "Y Origin: " << (int) originalImage.m_Header.YOrigin << endl;
+    cout << "Width: " << (int) originalImage.m_Header.Width << endl;
+    cout << "Height: " << (int) originalImage.m_Header.Height << endl;
+    cout << "Bits: " << (int) originalImage.m_Header.Bits << endl;
+    cout << "Pixel Size: " << originalImage.m_pixelSize << endl;
+    cout << "Descriptor: " << (int) originalImage.m_Header.ImageDescriptor << endl;
 
-    auto b = d.GetTgaImageBuffer();
-    auto processed = biLinearInterpolation(b, oldImage);
+    auto imageBuffer = decoder.Decode(fileName);
+    auto processedImageBuffer = biLinearInterpolation(imageBuffer, originalImage);
 
     Tga newImage;
-    Encoder e(outputFile, newImage);
-    if (!e.createImageHeader(oldImage.m_Header.Width / 2, oldImage.m_Header.Height / 2, oldImage.m_Header.Bits))
-        return 1;
-    if (!e.writeImageToFile(processed)) return 1;
+    string newFileName = fileNameWithoutExtension + PROCESSED_FILENAME_POSTFIX;
+    std::ofstream outputFile( newFileName, ios_base::binary);
+    Encoder encoder(outputFile, newImage);
+    if (!encoder.createImageHeader(originalImage.m_Header.Width / 2, originalImage.m_Header.Height / 2, originalImage.m_Header.Bits))
+        return INVALID_HEADER;
+    if (!encoder.writeImageToFile(processedImageBuffer)) return CANT_WRITE_FILE;
 
     inputFile.close();
     outputFile.close();
