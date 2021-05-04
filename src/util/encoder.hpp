@@ -2,10 +2,10 @@
 // Created by ozan on 2021-05-03.
 //
 
-#ifndef UBISOFT_ASSIGMENT_ENCODER_H
-#define UBISOFT_ASSIGMENT_ENCODER_H
+#ifndef UBISOFT_ASSIGMENT_ENCODER_HPP
+#define UBISOFT_ASSIGMENT_ENCODER_HPP
 
-#include "tga.h"
+#include "tga.hpp"
 #include <fstream>
 #include <vector>
 #include <cstdint>
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //UBISOFT_ASSIGMENT_ENCODER_H
+#endif //UBISOFT_ASSIGMENT_ENCODER_HPP

@@ -2,12 +2,14 @@
 // Created by ozan on 2021-05-01.
 //
 
-#include "decoder.h"
+#include "decoder.hpp"
+#include "exception.hpp"
+#include <iostream>
 
 std::vector<uint8_t> Decoder::Decode(std::string &fileName) {
     std::ifstream stream(fileName, std::ios_base::binary);
     if (!stream.is_open()) {
-        //throw error
+        throw Exception(FILE_NOT_FOUND, "File is not found");
     }
     FillTgaHeader(stream);
     CalculatePixelSize(_tgaImage.tgaHeader);
@@ -21,7 +23,7 @@ void Decoder::FillTgaHeader(std::ifstream &stream) {
     stream.read((char *) &_tgaImage.tgaHeader.imageType, sizeof(_tgaImage.tgaHeader.imageType));
     stream.read((char *) &_tgaImage.tgaHeader.colorMapOrigin, sizeof(_tgaImage.tgaHeader.colorMapOrigin));
     stream.read((char *) &_tgaImage.tgaHeader.colorMapLength, sizeof(_tgaImage.tgaHeader.colorMapLength));
-    stream.read((char *) &_tgaImage.tgaHeader.colorMapEntrySize,sizeof(_tgaImage.tgaHeader.colorMapEntrySize));
+    stream.read((char *) &_tgaImage.tgaHeader.colorMapEntrySize, sizeof(_tgaImage.tgaHeader.colorMapEntrySize));
     stream.read((char *) &_tgaImage.tgaHeader.xOrigin, sizeof(_tgaImage.tgaHeader.xOrigin));
     stream.read((char *) &_tgaImage.tgaHeader.yOrigin, sizeof(_tgaImage.tgaHeader.yOrigin));
     stream.read((char *) &_tgaImage.tgaHeader.width, sizeof(_tgaImage.tgaHeader.width));
@@ -39,8 +41,16 @@ uint32_t Decoder::CalculatePixelSize(TgaHeader_t &header) {
 
 
 void Decoder::FillTgaImageBuffer(std::ifstream &stream) {
-    auto mapIter = _readImageToBufferMap[(TgaImageType_t) _tgaImage.tgaHeader.imageType];
-    (this->*mapIter)(stream, _tgaImage.imageBuffer, _tgaImage.tgaHeader.bits);
+    if (_tgaImage.tgaHeader.imageType == UNCOMPRESSED_TRUECOLOR_IMAGE ||
+        _tgaImage.tgaHeader.imageType == UNCOMPRESSED_GRAYSCALE_IMAGE ||
+        _tgaImage.tgaHeader.imageType == RLE_TRUECOLOR_IMAGE) {
+        auto mapIter = _readImageToBufferMap.find((TgaImageType_t) _tgaImage.tgaHeader.imageType);
+
+        (this->*mapIter->second)(stream, _tgaImage.imageBuffer, _tgaImage.tgaHeader.bits);
+    } else {
+        throw Exception(INVALID_HEADER, "Invalid image type");
+    }
+
 }
 
 std::vector<uint8_t> Decoder::GetTgaImageBuffer() {
@@ -62,8 +72,8 @@ void Decoder::ReadCompressedImageToBuffer(std::ifstream &stream, std::vector<uin
 
     for (auto i = 0; i < imageSize;) {
         stream.read((char *) &rleHeader, sizeof(rleHeader));
-        numberOfPixels = (rleHeader & 0x7F) + 1; // Extract repetition for the packet
-        if (rleHeader & 0x80) { //Determine if it's RLE packet or normal packet
+        numberOfPixels = (rleHeader & RLE_LENGTH_BITMASK) + 1; // Extract repetition for the packet
+        if (rleHeader & RLE_CHUNK_BITMASK) { //Determine if it's RLE packet or normal packet
             stream.read((char *) &channelBuf[0], channelSize);
             for (auto j = 0; j < numberOfPixels; j++) {
                 for (auto k = 0; k < channelSize; k++) {

@@ -2,7 +2,7 @@
 // Created by ozan on 2021-05-01.
 //
 
-#include "tga.h"
+#include "tga.hpp"
 
 uint32_t Tga::Seek(uint32_t index, uint8_t direction) {
     uint32_t new_position{0};

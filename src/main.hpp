@@ -6,15 +6,15 @@
 #define RESIZE_MAIN_HPP
 
 #define NUM_OF_REQUIRED_ARGS    2
+#define STRING_DELIMITER "."
+#define PROCESSED_FILENAME_POSTFIX "_processed.tga";
 
-typedef enum{
-SUCCESS=0,
-INVALID_USAGE,
-FILE_IS_ALREADY_OPEN,
-INVALID_HEADER,
-INAVLID_BUFFER,
-ERR_LAST
-}statusCodes_t;
+#include <iostream>
+#include "tga.hpp"
+#include "decoder.hpp"
+#include "encoder.hpp"
+#include "image_processor.hpp"
+#include "exception.hpp"
 
 
 #endif //RESIZE_MAIN_H

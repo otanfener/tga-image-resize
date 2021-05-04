@@ -2,14 +2,15 @@
 // Created by ozan on 2021-05-01.
 //
 
-#ifndef UBISOFT_ASSIGMENT_DECODER_H
-#define UBISOFT_ASSIGMENT_DECODER_H
+#ifndef UBISOFT_ASSIGMENT_DECODER_HPP
+#define UBISOFT_ASSIGMENT_DECODER_HPP
 
 #include <fstream>
-#include "tga.h"
+#include "tga.hpp"
 #include <vector>
 #include <functional>
-#include <map>
+#include <unordered_map>
+#include <cstdint>
 
 class Decoder {
 
@@ -17,17 +18,15 @@ public:
     typedef void (Decoder::*bufferFunc)(std::ifstream &, std::vector<uint8_t> &, uint8_t);
     Decoder(Tga &tgaImage) : _tgaImage(tgaImage){
 
-        _readImageToBufferMap.insert(std::make_pair(UNCOMPRESSED_TRUECOLOR_IMAGE, &Decoder::ReadCompressedImageToBuffer));
-        _readImageToBufferMap.insert(std::make_pair(UNCOMPRESSED_GRAYSCALE_IMAGE, &Decoder::ReadCompressedImageToBuffer));
-        _readImageToBufferMap.insert(std::make_pair(RLE_TRUECOLOR_IMAGE, &Decoder::ReadCompressedImageToBuffer));
+        _readImageToBufferMap[UNCOMPRESSED_TRUECOLOR_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
+        _readImageToBufferMap[UNCOMPRESSED_GRAYSCALE_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
+        _readImageToBufferMap[RLE_TRUECOLOR_IMAGE] = &Decoder::ReadCompressedImageToBuffer;
 
     };
 
 private:
-//    std::function<void(std::ifstream &stream, std::vector<uint8_t> &b,
-//                       uint8_t bits)>
     Tga &_tgaImage;
-    std::map<TgaImageType_t, bufferFunc> _readImageToBufferMap;
+    std::unordered_map<TgaImageType_t, bufferFunc> _readImageToBufferMap;
 
     void ReadUncompressedImageToBuffer(std::ifstream &stream, std::vector<uint8_t> &buffer, uint8_t bits);
 
@@ -46,4 +45,4 @@ public:
 };
 
 
-#endif //UBISOFT_ASSIGMENT_DECODER_H
+#endif //UBISOFT_ASSIGMENT_DECODER_HPP

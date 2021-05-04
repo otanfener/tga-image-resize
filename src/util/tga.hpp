@@ -2,8 +2,8 @@
 // Created by ozan on 2021-05-01.
 //
 
-#ifndef UBISOFT_ASSIGMENT_TGA_H
-#define UBISOFT_ASSIGMENT_TGA_H
+#ifndef UBISOFT_ASSIGMENT_TGA_HPP
+#define UBISOFT_ASSIGMENT_TGA_HPP
 
 #include <cstdint>
 #include <vector>
@@ -26,15 +26,17 @@ typedef struct __attribute__((__packed__))  {
 }TgaHeader_t;
 
 typedef enum{
-    NO_IMAGE=0,
-    UNCOMPRESSED_COLORMAP_IMAGE=1,
     UNCOMPRESSED_TRUECOLOR_IMAGE=2,
     UNCOMPRESSED_GRAYSCALE_IMAGE=3,
-    RLE_COLORMAP_IMAGE=9,
     RLE_TRUECOLOR_IMAGE=10,
-    RLE_GRAYSCALE_IMAGE=11
+    IMAGE_LAST
 }TgaImageType_t;
 
+typedef enum{
+    RLE_CHUNK_BITMASK=0x80,
+    RLE_LENGTH_BITMASK=0x7F,
+    BITMASK_LAST
+}tgaBitmask_t;
 
 class Tga {
 public:
@@ -49,4 +51,4 @@ public:
 };
 
 
-#endif //UBISOFT_ASSIGMENT_TGA_H
+#endif //UBISOFT_ASSIGMENT_TGA_HPP
