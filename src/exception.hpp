@@ -30,7 +30,7 @@ private:
 
 };
 
-typedef enum {
+enum class StatusCode {
     SUCCESS = 0,
     INVALID_USAGE,
     INVALID_FILE,
@@ -39,6 +39,6 @@ typedef enum {
     INVALID_HEADER,
     INVALID_BUFFER,
     ERR_LAST
-} statusCodes_t;
+};
 
 #endif //UBISOFT_ASSIGMENT_EXCEPTION_H

@@ -16,7 +16,7 @@ static constexpr int DIVIDE_HALF = 3;
 std::vector<uint8_t> Decoder::Decode(std::string &fileName) {
     std::ifstream stream(fileName, std::ios_base::binary);
     if (!stream.is_open()) {
-        throw TgaException(FILE_NOT_FOUND, "File is not found");
+        throw TgaException(static_cast<uint32_t>(StatusCode::FILE_NOT_FOUND), "File is not found");
     }
     FillTgaHeader(stream);
     CalculatePixelSize(tgaImage_.tgaHeader_);
@@ -61,7 +61,7 @@ void Decoder::FillTgaImageBuffer(std::ifstream &stream) {
 
         (this->*mapIter->second)(stream, tgaImage_.imageBuffer_, tgaImage_.tgaHeader_.bits);
     } else {
-        throw TgaException(INVALID_HEADER, "Invalid image type");
+        throw TgaException(static_cast<uint32_t>(StatusCode::INVALID_HEADER), "Invalid image type");
     }
 
 }

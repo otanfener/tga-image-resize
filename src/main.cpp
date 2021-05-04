@@ -6,13 +6,13 @@ int main(int argc, const char *argv[]) {
     if ((argc < NUM_OF_REQUIRED_ARGS)) {
         const char *const USAGE = "Usage:\n\thalfsize <filename.tga> \n\nDescription:\n\tResizes given tga image file, and save it to a new tga image file.\n";
         std::cout << USAGE << std::endl;
-        return INVALID_USAGE;
+        return static_cast<int>(StatusCode::INVALID_USAGE);
     }
 
     std::string fileName = argv[1];
     if ((0 == fileName.length()) || (std::string::npos == fileName.find(".tga"))) {
-        std::cerr << "Invalid file" << std::endl;
-        return INVALID_FILE;
+        std::cerr << "Invalid file\n";
+        return static_cast<int>(StatusCode::INVALID_FILE);
     }
 
     try {
@@ -33,9 +33,9 @@ int main(int argc, const char *argv[]) {
                        originalImage.tgaHeader_.height / 2, originalImage.tgaHeader_.bits);
 
 
-        return SUCCESS;
+        return static_cast<int>(StatusCode::SUCCESS);
     } catch (const TgaException &e) {
-        std::cerr << "TgaException catched : " << e.what();
+        std::cerr << "TgaException catched : \n" << e.what();
         return e.GetErrorCode();
     }
 }
