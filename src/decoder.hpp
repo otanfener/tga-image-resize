@@ -17,6 +17,8 @@ class Decoder {
 public:
     typedef void (Decoder::*bufferFunc)(std::ifstream &, std::vector<uint8_t> &, uint8_t);
 
+    /// @brief Builds a decoder object for a given tga image object.
+    /// @param tgaImage Tga image object
     Decoder(Tga &tgaImage) : _tgaImage(tgaImage) {
 
         _readImageToBufferMap[UNCOMPRESSED_TRUECOLOR_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;

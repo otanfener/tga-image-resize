@@ -13,6 +13,9 @@
 class Exception : public std::exception {
 
 public:
+    /// @brief Constructs a custom exception object for given errorCode, and message.
+    /// @param errorCode Error code to be used when exceptions are created.
+    /// @param message Error message to be used when exceptions are created.
     Exception(uint32_t errorCode, const std::string &message) noexcept;
 
     virtual ~Exception() = default;

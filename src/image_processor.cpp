@@ -4,6 +4,11 @@
 
 #include "image_processor.hpp"
 
+///
+/// @brief Applies bilinear interpolation to the given image buffer.
+/// @param inputImage[in] Image buffer to be interpolated
+/// @param tgaImage[in]  Tga image object
+/// @return Processed image buffer as vector of bytes.
 std::vector<uint8_t> biLinearInterpolation(std::vector<uint8_t> &inputImage, Tga &tgaImage) {
     std::vector<uint8_t> outputImage;
     uint8_t interpolatedPixel;

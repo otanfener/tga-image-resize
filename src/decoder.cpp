@@ -6,6 +6,10 @@
 #include "exception.hpp"
 #include <iostream>
 
+
+/// @brief Reads a Targa image file from the disk, and returns underlying image data.
+/// @param fileName[in] Image file name.
+/// @return Image data as vector of bytes.
 std::vector<uint8_t> Decoder::Decode(std::string &fileName) {
     std::ifstream stream(fileName, std::ios_base::binary);
     if (!stream.is_open()) {
@@ -17,6 +21,8 @@ std::vector<uint8_t> Decoder::Decode(std::string &fileName) {
     return GetTgaImageBuffer();
 }
 
+/// @brief Reads Targa image header section from the file.
+/// @param stream[in] Input stream.
 void Decoder::FillTgaHeader(std::ifstream &stream) {
     stream.read((char *) &_tgaImage.tgaHeader.idLength, sizeof(_tgaImage.tgaHeader.idLength));
     stream.read((char *) &_tgaImage.tgaHeader.colorMapType, sizeof(_tgaImage.tgaHeader.colorMapType));
@@ -33,13 +39,17 @@ void Decoder::FillTgaHeader(std::ifstream &stream) {
 
 }
 
+/// @brief Calculates image pixel size.
+/// @param header[in] Targa image header.
+/// @return Calculated pixel size as unsigned integer.
 uint32_t Decoder::CalculatePixelSize(TgaHeader_t &header) {
     /* performance optimization:  (num/8) = (num>>3) */
     _tgaImage.pixelSize = header.colorMapLength == 0 ? (header.bits >> 3) : header.colorMapEntrySize;
     return _tgaImage.pixelSize;
 }
 
-
+/// @brief Reads image data from disk to a buffer.
+/// @param stream[in] Input stream.
 void Decoder::FillTgaImageBuffer(std::ifstream &stream) {
     if (_tgaImage.tgaHeader.imageType == UNCOMPRESSED_TRUECOLOR_IMAGE ||
         _tgaImage.tgaHeader.imageType == UNCOMPRESSED_GRAYSCALE_IMAGE ||
@@ -53,16 +63,25 @@ void Decoder::FillTgaImageBuffer(std::ifstream &stream) {
 
 }
 
+///
+/// @return Returns image data as a vector of bytes.
 std::vector<uint8_t> Decoder::GetTgaImageBuffer() {
     return _tgaImage.imageBuffer;
 }
 
+/// @brief Reads true color Targa image data from disk to a buffer.
+/// @param stream[in] Input stream.
+/// @param buffer[in,out] Image buffer to be filled.
+/// @param bits[in] Number of bits denoting each pixel.
 void Decoder::ReadUncompressedImageToBuffer(std::ifstream &stream, std::vector<uint8_t> &buffer, uint8_t bits) {
     std::vector<uint8_t> contents((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     buffer = contents;
 }
 
-
+/// @brief Reads RLE encoded Targa image data from disk to a buffer.
+/// @param stream[in] Input stream.
+/// @param buffer[in,out] Image buffer to be filled.
+/// @param bits[in] Number of bits denoting each pixel.
 void Decoder::ReadCompressedImageToBuffer(std::ifstream &stream, std::vector<uint8_t> &buffer, uint8_t bits) {
     uint8_t rleHeader;
     size_t numberOfPixels;
