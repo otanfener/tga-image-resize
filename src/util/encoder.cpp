@@ -4,27 +4,49 @@
 
 #include "encoder.h"
 
-
-bool Encoder::createImageHeader(uint16_t width, uint16_t height, uint8_t bits) {
-    m_Image.m_Header.IDLength = 0;
-    m_Image.m_Header.ColorMapType = 0;
-    m_Image.m_Header.ImageType = 2;
-    m_Image.m_Header.ColorMapOrigin = 0;
-    m_Image.m_Header.ColorMapLength = 0;
-    m_Image.m_Header.ColorMapEntrySize = 0;
-    m_Image.m_Header.XOrigin = 0;
-    m_Image.m_Header.YOrigin = 0;
-    m_Image.m_Header.Width = width;
-    m_Image.m_Header.Height = height;
-    m_Image.m_Header.Bits = bits;
-    m_Image.m_Header.ImageDescriptor = 0;
-    return true;
+TgaHeader_t Encoder::CreateTgaHeader(uint16_t width, uint16_t height, uint8_t bits) {
+    TgaHeader_t imageHeader;
+    imageHeader.idLength = 0;
+    imageHeader.colorMapType = 0;
+    imageHeader.imageType= 2; //Save as uncompressed true-color image
+    imageHeader.colorMapOrigin = 0;
+    imageHeader.colorMapLength = 0;
+    imageHeader.colorMapEntrySize = 0;
+    imageHeader.xOrigin = 0;
+    imageHeader.yOrigin = 0;
+    imageHeader.width = width;
+    imageHeader.height = height;
+    imageHeader.bits = bits;
+    imageHeader.imageDescriptor = 0;
+    return imageHeader;
 }
 
-bool Encoder::writeImageToFile(std::vector <uint8_t> &b) {
-    m_Stream.write((char *) &m_Image.m_Header, sizeof(m_Image.m_Header));
-    std::copy(b.begin(), b.end(), std::ostreambuf_iterator<char>(m_Stream));
-    m_Stream.flush();
-    if (m_Stream) return true;
-    else return false;
+void Encoder::WriteImageToDisk(std::ofstream &stream, TgaHeader_t &imageHeader, std::vector <uint8_t> &buffer) {
+    stream.write((char *) &imageHeader, sizeof(imageHeader));
+    std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator<char>(stream));
+    stream.flush();
+}
+
+void Encoder::Encode(std::string &fileName, std::vector<uint8_t> &imageBuffer, uint16_t width, uint16_t height, uint8_t bits) {
+    std::ofstream stream(fileName, std::ios_base::binary);
+    if (!stream.is_open()) {
+        //throw error
+    }
+//    auto imageHeader = CreateTgaHeader(width, height, bits);
+    TgaHeader_t imageHeader;
+    imageHeader.idLength = 0;
+    imageHeader.colorMapType = 0;
+    imageHeader.imageType= 2; //Save as uncompressed true-color image
+    imageHeader.colorMapOrigin = 0;
+    imageHeader.colorMapLength = 0;
+    imageHeader.colorMapEntrySize = 0;
+    imageHeader.xOrigin = 0;
+    imageHeader.yOrigin = 0;
+    imageHeader.width = width;
+    imageHeader.height = height;
+    imageHeader.bits = bits;
+    imageHeader.imageDescriptor = 0;
+
+    WriteImageToDisk(stream, imageHeader, imageBuffer);
+    stream.close();
 }

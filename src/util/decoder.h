@@ -8,37 +8,41 @@
 #include <fstream>
 #include "tga.h"
 #include <vector>
-#include <function>
-#include <unordered_map>
+#include <functional>
+#include <map>
 
 class Decoder {
+
 public:
-    Decoder(Tga &tgaImage) : _tgaImage(tgaImage),  _readImageToBufferMap{}{
-        _readImageToBufferMap[TGA_IMAGE_TYPE_TRUE_COLOR] = ReadUncompressedImageToBuffer;
-        _readImageToBufferMap[TGA_IMAGE_TYPE_GRAYSCALE] = ReadUncompressedImageToBuffer;
-        _readImageToBufferMap[TGA_IMAGE_RUN_LEN] = ReadCompressedImageToBuffer;
-        
+    typedef void (Decoder::*bufferFunc)(std::ifstream &, std::vector<uint8_t> &, uint8_t);
+    Decoder(Tga &tgaImage) : _tgaImage(tgaImage){
+
+        _readImageToBufferMap.insert(std::make_pair(UNCOMPRESSED_TRUECOLOR_IMAGE, &Decoder::ReadCompressedImageToBuffer));
+        _readImageToBufferMap.insert(std::make_pair(UNCOMPRESSED_GRAYSCALE_IMAGE, &Decoder::ReadCompressedImageToBuffer));
+        _readImageToBufferMap.insert(std::make_pair(RLE_TRUECOLOR_IMAGE, &Decoder::ReadCompressedImageToBuffer));
+
     };
 
 private:
-
+//    std::function<void(std::ifstream &stream, std::vector<uint8_t> &b,
+//                       uint8_t bits)>
     Tga &_tgaImage;
-    
-    std::unordered_map<TgaImageType_t,std::function<void(std::ifstream &m_Stream,std::vector <uint8_t> &b, uint8_t bits)>> _readImageToBufferMap;   
+    std::map<TgaImageType_t, bufferFunc> _readImageToBufferMap;
 
-    void ReadUncompressedImageToBuffer(std::ifstream &m_Stream,std::vector <uint8_t> &b, uint8_t bits);
-    void ReadCompressedImageToBuffer(std::ifstream &m_Stream,std::vector <uint8_t> &b, uint8_t bits);
-    void ReadColorMappedImageToBuffer(std::ifstream &m_Stream,std::vector<uint8_t> &b, uint8_t bits);
+    void ReadUncompressedImageToBuffer(std::ifstream &stream, std::vector<uint8_t> &buffer, uint8_t bits);
 
-    void FillTgaHeader(std::ifstream &m_Stream);
-    void FillTgaImageBuffer(std::ifstream &m_Stream);
-    std::vector <uint8_t> GetTgaImageBuffer();
+    void ReadCompressedImageToBuffer(std::ifstream &stream, std::vector<uint8_t> &buffer, uint8_t bits);
+
+    void FillTgaHeader(std::ifstream &stream);
+
+    void FillTgaImageBuffer(std::ifstream &stream);
+
+    std::vector<uint8_t> GetTgaImageBuffer();
+
     uint32_t CalculatePixelSize(TgaHeader_t &header);
 
 public:
-
-    std::vector<uint8_t> Decode(std::string& fileName);
-    
+    std::vector<uint8_t> Decode(std::string &fileName);
 };
 
 
