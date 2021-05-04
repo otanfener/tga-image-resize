@@ -16,7 +16,8 @@ class Decoder {
 
 public:
     typedef void (Decoder::*bufferFunc)(std::ifstream &, std::vector<uint8_t> &, uint8_t);
-    Decoder(Tga &tgaImage) : _tgaImage(tgaImage){
+
+    Decoder(Tga &tgaImage) : _tgaImage(tgaImage) {
 
         _readImageToBufferMap[UNCOMPRESSED_TRUECOLOR_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
         _readImageToBufferMap[UNCOMPRESSED_GRAYSCALE_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;

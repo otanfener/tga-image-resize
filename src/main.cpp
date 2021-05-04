@@ -15,7 +15,7 @@ int main(int argc, const char *argv[]) {
         std::cerr << "Invalid file" << std::endl;
         return INVALID_FILE;
     }
-    
+
     try {
         //Decoder
         Tga originalImage;

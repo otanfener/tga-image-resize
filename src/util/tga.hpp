@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 
-typedef struct __attribute__((__packed__))  {
+typedef struct __attribute__((__packed__)) {
     uint8_t idLength;
     uint8_t colorMapType;
     uint8_t imageType;
@@ -23,26 +23,26 @@ typedef struct __attribute__((__packed__))  {
     uint16_t height;
     uint8_t bits;
     uint8_t imageDescriptor;
-}TgaHeader_t;
+} TgaHeader_t;
 
-typedef enum{
-    UNCOMPRESSED_TRUECOLOR_IMAGE=2,
-    UNCOMPRESSED_GRAYSCALE_IMAGE=3,
-    RLE_TRUECOLOR_IMAGE=10,
+typedef enum {
+    UNCOMPRESSED_TRUECOLOR_IMAGE = 2,
+    UNCOMPRESSED_GRAYSCALE_IMAGE = 3,
+    RLE_TRUECOLOR_IMAGE = 10,
     IMAGE_LAST
-}TgaImageType_t;
+} TgaImageType_t;
 
-typedef enum{
-    RLE_CHUNK_BITMASK=0x80,
-    RLE_LENGTH_BITMASK=0x7F,
+typedef enum {
+    RLE_CHUNK_BITMASK = 0x80,
+    RLE_LENGTH_BITMASK = 0x7F,
     BITMASK_LAST
-}tgaBitmask_t;
+} tgaBitmask_t;
 
 class Tga {
 public:
-    
+
     TgaHeader_t tgaHeader;
-    std::vector <uint8_t> imageBuffer;
+    std::vector<uint8_t> imageBuffer;
     uint32_t pixelSize;
 
 public:

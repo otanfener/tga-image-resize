@@ -16,10 +16,14 @@ public:
 
 private:
     Tga &_tgaImage;
+
     TgaHeader_t CreateTgaHeader(uint16_t width, uint16_t height, uint8_t bits);
+
     void WriteImageToDisk(std::ofstream &stream, TgaHeader_t &imageHeader, std::vector<uint8_t> &buffer);
+
 public:
-    void Encode(std::string &fileName, std::vector<uint8_t> &imageBuffer, uint16_t width, uint16_t height, uint8_t bits);
+    void
+    Encode(std::string &fileName, std::vector<uint8_t> &imageBuffer, uint16_t width, uint16_t height, uint8_t bits);
 
 };
 
