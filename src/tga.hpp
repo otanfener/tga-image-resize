@@ -30,13 +30,13 @@ enum class TgaImageType {
     UNCOMPRESSED_GRAYSCALE_IMAGE = 3,
     RLE_TRUECOLOR_IMAGE = 10,
     IMAGE_LAST
-} ;
+};
 
 enum class TgaBitMask {
     RLE_CHUNK_BITMASK = 0x80,
     RLE_LENGTH_BITMASK = 0x7F,
     BITMASK_LAST
-} ;
+};
 
 class TgaImage {
 public:

@@ -12,6 +12,7 @@
 /// @return Image data as vector of bytes.
 
 static constexpr int DIVIDE_HALF = 3;
+
 std::vector<uint8_t> Decoder::Decode(std::string &fileName) {
     std::ifstream stream(fileName, std::ios_base::binary);
     if (!stream.is_open()) {
@@ -53,8 +54,8 @@ uint32_t Decoder::CalculatePixelSize(TgaHeader_t &header) {
 /// @brief Reads image data from disk to a buffer.
 /// @param stream[in] Input stream.
 void Decoder::FillTgaImageBuffer(std::ifstream &stream) {
-    if (tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::UNCOMPRESSED_TRUECOLOR_IMAGE)||
-        tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::UNCOMPRESSED_GRAYSCALE_IMAGE)||
+    if (tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::UNCOMPRESSED_TRUECOLOR_IMAGE) ||
+        tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::UNCOMPRESSED_GRAYSCALE_IMAGE) ||
         tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::RLE_TRUECOLOR_IMAGE)) {
         auto mapIter = readImageToBufferMap_.find((TgaImageType) tgaImage_.tgaHeader_.imageType);
 
@@ -93,8 +94,10 @@ void Decoder::ReadCompressedImageToBuffer(std::ifstream &stream, std::vector<uin
 
     for (auto i = 0; i < imageSize;) {
         stream.read((char *) &rleHeader, sizeof(rleHeader));
-        numberOfPixels = (rleHeader & static_cast<uint8_t>(TgaBitMask::RLE_LENGTH_BITMASK)) + 1; // Extract repetition for the packet
-        if (rleHeader & static_cast<uint8_t>(TgaBitMask::RLE_CHUNK_BITMASK)) { //Determine if it's RLE packet or normal packet
+        numberOfPixels = (rleHeader & static_cast<uint8_t>(TgaBitMask::RLE_LENGTH_BITMASK)) +
+                         1; // Extract repetition for the packet
+        if (rleHeader &
+            static_cast<uint8_t>(TgaBitMask::RLE_CHUNK_BITMASK)) { //Determine if it's RLE packet or normal packet
             stream.read((char *) &channelBuf[0], channelSize);
             for (auto j = 0; j < numberOfPixels; j++) {
                 for (auto k = 0; k < channelSize; k++) {
