@@ -9,6 +9,6 @@
 #include <cstdint>
 #include <vector>
 
-std::vector<uint8_t> biLinearInterpolation(std::vector<uint8_t> &inputImage, Tga &tgaImage);
+std::vector<uint8_t> BiLinearInterPolation(std::vector<uint8_t> &inputImage, TgaImage &tgaImage);
 
 #endif //UBISOFT_ASSIGMENT_IMAGE_PROCESSOR_HPP

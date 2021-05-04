@@ -25,25 +25,24 @@ typedef struct __attribute__((__packed__)) {
     uint8_t imageDescriptor;
 } TgaHeader_t;
 
-typedef enum {
+enum class TgaImageType {
     UNCOMPRESSED_TRUECOLOR_IMAGE = 2,
     UNCOMPRESSED_GRAYSCALE_IMAGE = 3,
     RLE_TRUECOLOR_IMAGE = 10,
     IMAGE_LAST
-} TgaImageType_t;
+} ;
 
-typedef enum {
+enum class TgaBitMask {
     RLE_CHUNK_BITMASK = 0x80,
     RLE_LENGTH_BITMASK = 0x7F,
     BITMASK_LAST
-} tgaBitmask_t;
+} ;
 
-class Tga {
+class TgaImage {
 public:
-
-    TgaHeader_t tgaHeader;
-    std::vector<uint8_t> imageBuffer;
-    uint32_t pixelSize;
+    TgaHeader_t tgaHeader_;
+    std::vector<uint8_t> imageBuffer_;
+    uint32_t pixelSize_;
 
 public:
     uint32_t Seek(uint32_t index, uint8_t direction);

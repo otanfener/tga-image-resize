@@ -47,7 +47,7 @@ void Encoder::Encode(std::string &fileName, std::vector<uint8_t> &imageBuffer, u
                      uint8_t bits) {
     std::ofstream stream(fileName, std::ios_base::binary);
     if (!stream.is_open()) {
-        throw Exception(FILE_NOT_FOUND, "File is not found");
+        throw TgaException(FILE_NOT_FOUND, "File is not found");
     }
     auto imageHeader = CreateTgaHeader(width, height, bits);
     WriteImageToDisk(stream, imageHeader, imageBuffer);

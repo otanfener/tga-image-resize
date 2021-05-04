@@ -9,23 +9,23 @@
 /// @param index[in]  Starting index of seek function.
 /// @param direction[in]  Seek direction.
 /// @return Seeked index.
-uint32_t Tga::Seek(uint32_t index, uint8_t direction) {
+uint32_t TgaImage::Seek(uint32_t index, uint8_t direction) {
     uint32_t new_position{0};
     switch (direction) {
         case 'R':
-            new_position = index + pixelSize;
+            new_position = index + pixelSize_;
             break;
         case 'U':
-            new_position = index - this->tgaHeader.width * pixelSize;
+            new_position = index - this->tgaHeader_.width * pixelSize_;
             break;
         case 'D':
-            new_position = index + this->tgaHeader.width * pixelSize;
+            new_position = index + this->tgaHeader_.width * pixelSize_;
             break;
         case 'X':
-            new_position = index + (this->tgaHeader.width + 1) * pixelSize;
+            new_position = index + (this->tgaHeader_.width + 1) * pixelSize_;
             break;
         default:
-            new_position = index - pixelSize;
+            new_position = index - pixelSize_;
             break;
     }
 

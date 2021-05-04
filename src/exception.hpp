@@ -10,23 +10,23 @@
 #include <string>
 #include <iostream>
 
-class Exception : public std::exception {
+class TgaException : public std::exception {
 
 public:
     /// @brief Constructs a custom exception object for given errorCode, and message.
     /// @param errorCode Error code to be used when exceptions are created.
     /// @param message Error message to be used when exceptions are created.
-    Exception(uint32_t errorCode, const std::string &message) noexcept;
+    TgaException(uint32_t errorCode, const std::string &message) noexcept;
 
-    virtual ~Exception() = default;
+    virtual ~TgaException() = default;
 
     virtual const char *what() const noexcept override;
 
     const uint32_t GetErrorCode() const;
 
 private:
-    uint32_t _errorCode;
-    std::string _message;
+    uint32_t errorCode_;
+    std::string message_;
 
 };
 

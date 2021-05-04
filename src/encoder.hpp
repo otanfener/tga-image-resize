@@ -13,11 +13,11 @@
 class Encoder {
 public:
     /// @brief Builds an encoder object for a given tga image object.
-    /// @param tgaImage Tga image object
-    Encoder(Tga &tgaImage) : _tgaImage(tgaImage) {};
+    /// @param tgaImage TgaImage image object
+    Encoder(TgaImage &tgaImage) : tgaImage_(tgaImage) {};
 
 private:
-    Tga &_tgaImage;
+    TgaImage &tgaImage_;
 
     TgaHeader_t CreateTgaHeader(uint16_t width, uint16_t height, uint8_t bits);
 

@@ -18,18 +18,18 @@ public:
     typedef void (Decoder::*bufferFunc)(std::ifstream &, std::vector<uint8_t> &, uint8_t);
 
     /// @brief Builds a decoder object for a given tga image object.
-    /// @param tgaImage Tga image object
-    Decoder(Tga &tgaImage) : _tgaImage(tgaImage) {
+    /// @param tgaImage TgaImage image object
+    Decoder(TgaImage &tgaImage) : tgaImage_(tgaImage) {
 
-        _readImageToBufferMap[UNCOMPRESSED_TRUECOLOR_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
-        _readImageToBufferMap[UNCOMPRESSED_GRAYSCALE_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
-        _readImageToBufferMap[RLE_TRUECOLOR_IMAGE] = &Decoder::ReadCompressedImageToBuffer;
+        readImageToBufferMap_[TgaImageType::UNCOMPRESSED_TRUECOLOR_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
+        readImageToBufferMap_[TgaImageType::UNCOMPRESSED_GRAYSCALE_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
+        readImageToBufferMap_[TgaImageType::RLE_TRUECOLOR_IMAGE] = &Decoder::ReadCompressedImageToBuffer;
 
     };
 
 private:
-    Tga &_tgaImage;
-    std::unordered_map<TgaImageType_t, bufferFunc> _readImageToBufferMap;
+    TgaImage &tgaImage_;
+    std::unordered_map<TgaImageType, bufferFunc> readImageToBufferMap_;
 
     void ReadUncompressedImageToBuffer(std::ifstream &stream, std::vector<uint8_t> &buffer, uint8_t bits);
 
