@@ -42,7 +42,7 @@ int main(int argc, const char *argv[]) {
         std::cout << "Operation completed" << std::endl;
         return static_cast<int>(StatusCode::SUCCESS);
     } catch (const TgaException &e) {
-        std::cerr << "TgaException catched : \n" << e.what();
+        std::cerr << "TgaException catched : " << e.what() << "\n";
         return e.GetErrorCode();
     }
 }
