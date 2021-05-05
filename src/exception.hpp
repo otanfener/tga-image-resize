@@ -16,13 +16,13 @@ public:
     /// @brief Constructs a custom exception object for given errorCode, and message.
     /// @param errorCode Error code to be used when exceptions are created.
     /// @param message Error message to be used when exceptions are created.
-    TgaException(uint32_t errorCode, const std::string &message) noexcept;
+    TgaException(uint32_t errorCode, std::string message) noexcept;
 
-    virtual ~TgaException() = default;
+    ~TgaException() override = default;
 
-    virtual const char *what() const noexcept override;
+    const char *what() const noexcept override;
 
-    const uint32_t GetErrorCode() const;
+    uint32_t GetErrorCode() const;
 
 private:
     uint32_t errorCode_;

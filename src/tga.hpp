@@ -5,25 +5,33 @@
 #ifndef UBISOFT_ASSIGMENT_TGA_HPP
 #define UBISOFT_ASSIGMENT_TGA_HPP
 
+#ifdef __GNUC__
+#define PACK(__Declaration__) __Declaration__ __attribute__((__packed__))
+#endif
+
+#ifdef _MSC_VER
+#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop))
+#endif
+
 #include <cstdint>
 #include <vector>
 
-typedef struct __attribute__((__packed__)) {
-    uint8_t idLength;
-    uint8_t colorMapType;
-    uint8_t imageType;
+typedef PACK(struct {
+                 uint8_t idLength;
+                 uint8_t colorMapType;
+                 uint8_t imageType;
 
-    uint16_t colorMapOrigin;
-    uint16_t colorMapLength;
-    uint8_t colorMapEntrySize;
+                 uint16_t colorMapOrigin;
+                 uint16_t colorMapLength;
+                 uint8_t colorMapEntrySize;
 
-    uint16_t xOrigin;
-    uint16_t yOrigin;
-    uint16_t width;
-    uint16_t height;
-    uint8_t bits;
-    uint8_t imageDescriptor;
-} TgaHeader_t;
+                 uint16_t xOrigin;
+                 uint16_t yOrigin;
+                 uint16_t width;
+                 uint16_t height;
+                 uint8_t bits;
+                 uint8_t imageDescriptor;
+             }) TgaHeader_t;
 
 enum class TgaImageType {
     UNCOMPRESSED_TRUECOLOR_IMAGE = 2,
@@ -46,7 +54,7 @@ public:
     uint32_t pixelSize_;
 
 public:
-    uint32_t Seek(uint32_t index, uint8_t direction);
+    uint32_t Seek(uint32_t index, uint8_t direction) const;
 
 };
 

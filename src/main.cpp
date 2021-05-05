@@ -33,7 +33,7 @@ int main(int argc, const char *argv[]) {
         TgaImage newImage;
         std::string fileNameWithoutExtension = fileName.substr(0, fileName.find(STRING_DELIMITER));
         std::string newFileName = fileNameWithoutExtension + PROCESSED_FILENAME_POSTFIX;
-        Encoder encoder(newImage);
+        Encoder encoder;
 
         std::cout << "Creating a new image: " << newFileName << std::endl;
         encoder.Encode(newFileName, processedImageBuffer, originalImage.tgaHeader_.width / 2,
@@ -43,6 +43,6 @@ int main(int argc, const char *argv[]) {
         return static_cast<int>(StatusCode::SUCCESS);
     } catch (const TgaException &e) {
         std::cerr << "TgaException catched : " << e.what() << "\n";
-        return e.GetErrorCode();
+        return static_cast<int >(e.GetErrorCode());
     }
 }

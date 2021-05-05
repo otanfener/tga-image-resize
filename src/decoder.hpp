@@ -19,7 +19,7 @@ public:
 
     /// @brief Builds a decoder object for a given tga image object.
     /// @param tgaImage TgaImage image object
-    Decoder(TgaImage &tgaImage) : tgaImage_(tgaImage) {
+    explicit Decoder(TgaImage &tgaImage) : tgaImage_(tgaImage) {
 
         readImageToBufferMap_[TgaImageType::UNCOMPRESSED_TRUECOLOR_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
         readImageToBufferMap_[TgaImageType::UNCOMPRESSED_GRAYSCALE_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
@@ -40,7 +40,7 @@ private:
 
     void FillTgaImageBuffer(std::ifstream &stream);
 
-    std::vector<uint8_t> GetTgaImageBuffer();
+    std::vector<uint8_t> GetTgaImageBuffer() const;
 
     uint32_t CalculatePixelSize(TgaHeader_t &header);
 

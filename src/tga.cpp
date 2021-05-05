@@ -9,8 +9,8 @@
 /// @param index[in]  Starting index of seek function.
 /// @param direction[in]  Seek direction.
 /// @return Seeked index.
-uint32_t TgaImage::Seek(uint32_t index, uint8_t direction) {
-    uint32_t new_position{0};
+uint32_t TgaImage::Seek(uint32_t index, uint8_t direction) const {
+    uint32_t new_position;
     switch (direction) {
         case 'R':
             new_position = index + pixelSize_;

@@ -1,8 +1,18 @@
 cmake_minimum_required(VERSION 3.2)
 project(ubisoft_assignment)
-
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -O3")
+
+if(MSVC)
+    add_compile_options("/Wall" "/std:c++17" "$<$<CONFIG:RELEASE>:/O2>")
+else()
+    add_compile_options("-std=c++17" "-Wall" "-Wextra" "-Werror" "$<$<CONFIG:RELEASE>:-O3>")
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        add_compile_options("-stdlib=libc++")
+    else()
+    endif()
+endif()
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -Werror -O3")
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
 

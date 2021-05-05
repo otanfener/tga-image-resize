@@ -4,8 +4,10 @@
 
 #include "exception.hpp"
 
-TgaException::TgaException(uint32_t errorCode, const std::string &message) noexcept:
-        errorCode_(errorCode), message_(message) {
+#include <utility>
+
+TgaException::TgaException(uint32_t errorCode, std::string message) noexcept:
+        errorCode_(errorCode), message_(std::move(message)) {
 }
 
 /// @brief Returns underlying exception string.
@@ -16,6 +18,6 @@ const char *TgaException::what() const noexcept {
 
 /// @brief Returns error code.
 /// @return Exception error code as unsigned integer.
-const uint32_t TgaException::GetErrorCode() const {
+uint32_t TgaException::GetErrorCode() const {
     return errorCode_;
 }

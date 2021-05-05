@@ -5,6 +5,7 @@
 #include "decoder.hpp"
 #include "exception.hpp"
 #include <iostream>
+#include <memory>
 
 
 /// @brief Reads a Targa image file from the disk, and returns underlying image data.
@@ -69,7 +70,7 @@ void Decoder::FillTgaImageBuffer(std::ifstream &stream) {
 
 ///
 /// @return Returns image data as a vector of bytes.
-std::vector<uint8_t> Decoder::GetTgaImageBuffer() {
+std::vector<uint8_t> Decoder::GetTgaImageBuffer() const {
     return tgaImage_.imageBuffer_;
 }
 
@@ -78,6 +79,7 @@ std::vector<uint8_t> Decoder::GetTgaImageBuffer() {
 /// @param buffer[in,out] Image buffer to be filled.
 /// @param bits[in] Number of bits denoting each pixel.
 void Decoder::ReadUncompressedImageToBuffer(std::ifstream &stream, std::vector<uint8_t> &buffer, uint8_t bits) {
+    (void) bits;
     std::vector<uint8_t> contents((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     buffer = contents;
 }
@@ -89,27 +91,27 @@ void Decoder::ReadUncompressedImageToBuffer(std::ifstream &stream, std::vector<u
 void Decoder::ReadCompressedImageToBuffer(std::ifstream &stream, std::vector<uint8_t> &buffer, uint8_t bits) {
     uint8_t rleHeader;
     size_t numberOfPixels;
-    size_t channelSize = (bits >> DIVIDE_HALF);
-    uint8_t channelBuf[channelSize];
+    uint8_t channelSize = (bits >> DIVIDE_HALF);
+    std::unique_ptr<uint8_t[]> channelBuf(new uint8_t[channelSize]);
     size_t imageSize = tgaImage_.tgaHeader_.height * tgaImage_.tgaHeader_.width;
 
-    for (auto i = 0; i < imageSize;) {
+    for (size_t i = 0; i < imageSize;) {
         stream.read((char *) &rleHeader, sizeof(rleHeader));
         numberOfPixels = (rleHeader & static_cast<uint8_t>(TgaBitMask::RLE_LENGTH_BITMASK)) +
                          1; // Extract repetition for the packet
         if (rleHeader &
             static_cast<uint8_t>(TgaBitMask::RLE_CHUNK_BITMASK)) { //Determine if it's RLE packet or normal packet
             stream.read((char *) &channelBuf[0], channelSize);
-            for (auto j = 0; j < numberOfPixels; j++) {
-                for (auto k = 0; k < channelSize; k++) {
+            for (size_t j = 0; j < numberOfPixels; j++) {
+                for (size_t k = 0; k < channelSize; k++) {
                     buffer.push_back(channelBuf[k]);
                 }
             }
             i += numberOfPixels;
         } else {
-            for (auto j = 0; j < numberOfPixels; j++) {
-                stream.read((char *) &channelBuf[0], channelSize);
-                for (auto k = 0; k < channelSize; k++) {
+            for (size_t j = 0; j < numberOfPixels; j++) {
+                stream.read((char *)&channelBuf[0], channelSize);
+                for (size_t k = 0; k < channelSize; k++) {
                     buffer.push_back(channelBuf[k]);
                 }
             }

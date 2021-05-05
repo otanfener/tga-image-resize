@@ -15,7 +15,7 @@ std::vector<uint8_t> BiLinearInterPolation(std::vector<uint8_t> &inputImage, Tga
     for (auto ix = 0; ix < tgaImage.tgaHeader_.height; ix += 2) {
         for (auto iy = 0; iy < tgaImage.tgaHeader_.width; iy += 2) {
             auto jump = (tgaImage.tgaHeader_.width * ix * tgaImage.pixelSize_) + iy * tgaImage.pixelSize_;
-            for (auto ij = 0; ij < tgaImage.pixelSize_; ij++) {
+            for (size_t ij = 0; ij < tgaImage.pixelSize_; ij++) {
                 interpolatedPixel =
                         (inputImage[jump + ij] + inputImage[tgaImage.Seek(jump + ij, 'R')] +
                          inputImage[tgaImage.Seek(jump + ij, 'D')] +
