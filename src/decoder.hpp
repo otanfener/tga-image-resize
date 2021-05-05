@@ -24,6 +24,7 @@ public:
         readImageToBufferMap_[TgaImageType::UNCOMPRESSED_TRUECOLOR_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
         readImageToBufferMap_[TgaImageType::UNCOMPRESSED_GRAYSCALE_IMAGE] = &Decoder::ReadUncompressedImageToBuffer;
         readImageToBufferMap_[TgaImageType::RLE_TRUECOLOR_IMAGE] = &Decoder::ReadCompressedImageToBuffer;
+        readImageToBufferMap_[TgaImageType::RLE_GRAYSCALE_IMAGE] = &Decoder::ReadCompressedImageToBuffer;
 
     };
 

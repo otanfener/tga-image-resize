@@ -56,7 +56,8 @@ uint32_t Decoder::CalculatePixelSize(TgaHeader_t &header) {
 void Decoder::FillTgaImageBuffer(std::ifstream &stream) {
     if (tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::UNCOMPRESSED_TRUECOLOR_IMAGE) ||
         tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::UNCOMPRESSED_GRAYSCALE_IMAGE) ||
-        tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::RLE_TRUECOLOR_IMAGE)) {
+        tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::RLE_TRUECOLOR_IMAGE) ||
+        tgaImage_.tgaHeader_.imageType == static_cast<uint8_t>(TgaImageType::RLE_GRAYSCALE_IMAGE)) {
         auto mapIter = readImageToBufferMap_.find((TgaImageType) tgaImage_.tgaHeader_.imageType);
 
         (this->*mapIter->second)(stream, tgaImage_.imageBuffer_, tgaImage_.tgaHeader_.bits);
