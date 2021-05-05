@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.2)
 project(ubisoft_assigment)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -12,7 +12,6 @@ set(RESIZE_INSTALL_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 
 
 include_directories(${RESIZE_INSTALL_INCLUDE_DIR})
-include_directories(${RESIZE_UTIL_HEADERS_DIR})
 
 add_subdirectory(src)
 add_subdirectory(test)

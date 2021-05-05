@@ -95,14 +95,15 @@ The project is implemented in C++ and considers portability as a first principle
 ### Prerequisites
 
 - C++17 supporting compiler
-- CMake 3.16 or above
+- CMake 3.2 or above
 
 ### Installation
 
-After unzip the project file to a directory, simply apply the following steps:
+After unzip or cloning the project to a directory, simply apply the following steps:
 
 For Linux:
 
+- ```git submodule init && git submodule update```
 - ```mkdir build & cd build```
 - ```cmake ..```
 - ```make & make install```
