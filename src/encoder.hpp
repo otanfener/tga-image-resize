@@ -25,7 +25,7 @@ private:
 
 public:
     void
-    Encode(std::string &fileName, std::vector<uint8_t> &imageBuffer, uint16_t width, uint16_t height, uint8_t bits);
+    Encode(const std::string &fileName, std::vector<uint8_t> &imageBuffer, uint16_t width, uint16_t height, uint8_t bits);
 
 };
 

@@ -13,7 +13,7 @@
 
 static constexpr int DIVIDE_HALF = 3;
 
-std::vector<uint8_t> Decoder::Decode(std::string &fileName) {
+std::vector<uint8_t> Decoder::Decode(const std::string &fileName) {
     std::ifstream stream(fileName, std::ios_base::binary);
     if (!stream.is_open()) {
         throw TgaException(static_cast<uint32_t>(StatusCode::FILE_NOT_FOUND), "File is not found");

@@ -45,7 +45,7 @@ private:
     uint32_t CalculatePixelSize(TgaHeader_t &header);
 
 public:
-    std::vector<uint8_t> Decode(std::string &fileName);
+    std::vector<uint8_t> Decode(const std::string &fileName);
 };
 
 

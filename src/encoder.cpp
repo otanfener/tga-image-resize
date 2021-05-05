@@ -43,7 +43,7 @@ void Encoder::WriteImageToDisk(std::ofstream &stream, TgaHeader_t &imageHeader, 
 /// @param width[in] Width of the image file.
 /// @param height[in] Height of the image file.
 /// @param bits[in] Number of bits to denote each pixel.
-void Encoder::Encode(std::string &fileName, std::vector<uint8_t> &imageBuffer, uint16_t width, uint16_t height,
+void Encoder::Encode(const std::string &fileName, std::vector<uint8_t> &imageBuffer, uint16_t width, uint16_t height,
                      uint8_t bits) {
     std::ofstream stream(fileName, std::ios_base::binary);
     if (!stream.is_open()) {
