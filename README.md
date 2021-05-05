@@ -101,9 +101,8 @@ The project is implemented in C++ and considers portability as a first principle
 
 After unzip or cloning the project to a directory, simply apply the following steps:
 
-For Linux:
+For Linux/Mac OS:
 
-- ```git submodule init && git submodule update```
 - ```mkdir build & cd build```
 - ```cmake ..```
 - ```make & make install```
