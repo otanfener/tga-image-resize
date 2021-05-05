@@ -110,7 +110,7 @@ void Decoder::ReadCompressedImageToBuffer(std::ifstream &stream, std::vector<uin
             i += numberOfPixels;
         } else {
             for (size_t j = 0; j < numberOfPixels; j++) {
-                stream.read((char *)&channelBuf[0], channelSize);
+                stream.read((char *) &channelBuf[0], channelSize);
                 for (size_t k = 0; k < channelSize; k++) {
                     buffer.push_back(channelBuf[k]);
                 }
