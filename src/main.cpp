@@ -36,8 +36,8 @@ int main(int argc, const char *argv[]) {
         Encoder encoder;
 
         std::cout << "Creating a new image: " << newFileName << std::endl;
-        encoder.Encode(newFileName, processedImageBuffer, originalImage.tgaHeader_.width / 2,
-                       originalImage.tgaHeader_.height / 2, originalImage.tgaHeader_.bits);
+        encoder.Encode(newFileName, processedImageBuffer, static_cast<uint16_t>(originalImage.tgaHeader_.width >> 1),
+                       static_cast<uint16_t>(originalImage.tgaHeader_.height >> 1), originalImage.tgaHeader_.bits);
 
         std::cout << "Operation completed" << std::endl;
         return static_cast<int>(StatusCode::SUCCESS);
