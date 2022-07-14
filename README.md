@@ -1,5 +1,5 @@
 
-# TGA image half-sizing implementation
+# TGA image resizing by half implementation
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
